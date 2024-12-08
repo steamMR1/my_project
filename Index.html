@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Advanced WebVM</title>
+  <style>
+    /* Estilos básicos */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e1e;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #0078d7;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    #sidebar {
+      width: 25%;
+      background-color: #2d2d2d;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    #workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #tabs {
+      display: flex;
+      background-color: #333;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background: #444;
+      color: white;
+      border: none;
+    }
+    .tab.active {
+      background: #0078d7;
+    }
+    #content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #1e1e1e;
+    }
+    #terminal, #editor {
+      flex: 1;
+      padding: 10px;
+      overflow: auto;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm/dist/xterm.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs/loader.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Super Advanced WebVM</h1>
+    <div id="controls">
+      <button id="start-vm">Start VM</button>
+      <button id="stop-vm">Stop VM</button>
+      <select id="theme-selector">
+        <option value="light">Light Theme</option>
+        <option value="dark" selected>Dark Theme</option>
+      </select>
+    </div>
+  </header>
+  <main>
+    <div id="sidebar">
+      <h3>File Explorer</h3>
+      <ul id="file-tree"></ul>
+      <input type="file" id="upload-file" />
+    </div>
+    <div id="workspace">
+      <div id="tabs">
+        <button class="tab active" data-tab="terminal">Terminal</button>
+        <button class="tab" data-tab="editor">Editor</button>
+      </div>
+      <div id="content">
+        <div id="terminal"></div>
+        <div id="editor" style="display: none;"></div>
+      </div>
+    </div>
+  </main>
+  <script>
+    // Iniciar y detener la máquina virtual
+    document.getElementById('start-vm').addEventListener('click', function() {
+      alert('Iniciando VM...');
+      terminal.write('VM started...\n');
+    });
+    document.getElementById('stop-vm').addEventListener('click', function() {
+      alert('Deteniendo VM...');
+      terminal.write('VM stopped...\n');
+    });
+
+    // Cambiar tema de Monaco Editor
+    document.getElementById('theme-selector').addEventListener('change', function(e) {
+      const theme = e.target.value === 'dark' ? 'vs-dark' : 'vs-light';
+      monaco.editor.setTheme(theme);
+    });
+
+    // Pestañas de Terminal y Editor
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tabContent = tab.getAttribute('data-tab');
+        document.getElementById('terminal').style.display = tabContent === 'terminal' ? 'block' : 'none';
+        document.getElementById('editor').style.display = tabContent === 'editor' ? 'block' : 'none';
+      });
+    });
+
+    // Terminal
+    const terminal = new Terminal();
+    terminal.open(document.getElementById('terminal'));
+    terminal.write('Welcome to the advanced terminal!\n');
+
+    // Editor Monaco
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+      monaco.editor.create(document.getElementById('editor'), {
+        value: '// Start coding here...\n',
+        language: 'javascript',
+        theme: 'vs-dark',
+      });
+    });
+  </script>
+</body>
+</html>
